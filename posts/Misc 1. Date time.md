@@ -2,7 +2,17 @@
 
 ### ISO 8601 format
 
-ISO 8601 是表达日期和时间的一种国际标准，完整体格式: `YYYY-MM-DDTHH:mm:ss.SSS[UTC offset]`
+什么是 ISO 8601?
+
+ISO 8601 是表示日期和时间的一种国际标准，完整格式: `YYYY-MM-DDTHH:mm:ss.SSS[UTC offset]`
+
+为什么需要 ISO 8601?
+
+主要有：
+1. 消除日期的不确定性，e.g. `07/01/2023`, 在美国会被理解为 `2023-07-01`，在英国被理解为 `2023-01-07`
+1. 解决跨世纪的问题，`1999` -> `2000`, 用 `YY` 表示会存在问题，而用 `YYYY` 就没有问题
+
+参考: [What is ISO 8601 by MIT](http://web.mit.edu/jmorzins/www/iso8601/y2kiso.htm)
 
 > 1. YYYY: Year, 4 位
 > 1. MM: Month, 2 位, 01 - 12
