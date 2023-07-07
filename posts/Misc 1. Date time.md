@@ -35,9 +35,9 @@ ISO 8601 是表示日期和时间的一种国际标准，完整格式: `YYYY-MM-
 
 ### 原生 `Date` object
 
-原生 `Date` object 内部存储的**永远**是 `UTC` 整数值 (精确到 3 位毫秒), 起始点是 `1970-01-01T00:00:00.000Z`. e.g. `new Date('1970-01-01T08:00:00.123+08:00')` 这个对象的 `valueOf()` 结果是 123
+原生 `Date` object 内部存储的是 `UTC` 整数值 (精确到 3 位毫秒), 起始点是 `1970-01-01T00:00:00.000Z`. e.g. `new Date('1970-01-01T08:00:00.123+08:00')` 这个对象的 `valueOf()` 结果是 123
 
-非常重要：虽然**内部存储**的是 UTC 日期时间，但我们**使用**的是转换后的 local 日期时间
+非常重要：**内部存储**的是 UTC 日期时间对应的整数值，但我们**使用**的是转换后的 local 日期时间
 
 - `string` 值 -> `Date` 对象
   - `new Date(stringArg)`, **记得让** stringArg 符合 ISO 8601 format, 请勿使用 date-only forms (比如 "2023-07-01"), 会被看成是 UTC time, 而不是 local time, 而且不同 EcmaScript 实现还不相同
@@ -46,16 +46,14 @@ ISO 8601 是表示日期和时间的一种国际标准，完整格式: `YYYY-MM-
 
 ### 第三方库 dayjs
 
-`Dayjs` 对象是原生 `Date` 对象的 wrapper.
-
-非常重要：虽然**内部存储**的是 UTC 日期时间，但我们**使用**的是转换后的 local 日期时间
+非常重要：`Dayjs` 对象是**原生 `Date` 对象的 wrapper**
 
 - `string` 值 -> `Dayjs` 对象
   - `dayjs(stringArg)`, stringArg 符合 ISO 8601 format 时用
   - `dayjs(stringArg, <customParseFormat>)`, stringArg 不符合 ISO 8601 format 时用，使用前需要引入 `customParseFormat`, 如果不引入，那就可看成是 `dayjs(stringArg)`。实例请看《实战 - 问题 1 和 2》
 - `Dayjs` 对象 -> `string` 值
-  - `toISOString()`, 结果是 UTC time
-  - `format([template])`, 结果是 UTC offset time 或 UTC time, 可以不输入 template, 默认 template 是 `YYYY-MM-DDTHH:mm:ssZ`, 特别注意：这里的`Z`并不是去获取 UTC time，它说的是要保留时区信息。实例请看《实战 - 问题 3》
+  - `toISOString()`, 调用的是原生 `Date` 对象的 `toISOString`方法，结果是 UTC time
+  - `format([template])`, template会决定结果, 可以不输入 template, 默认 template 是 `YYYY-MM-DDTHH:mm:ssZ`, 特别注意：这里的`Z`并不是去获取 UTC time，它说的是要保留时区信息。实例请看《实战 - 问题 3》
 
 ### 实战
 
