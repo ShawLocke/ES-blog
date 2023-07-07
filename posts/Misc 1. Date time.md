@@ -52,10 +52,10 @@ ISO 8601 是表示日期和时间的一种国际标准，完整格式: `YYYY-MM-
 
 - `string` 值 -> `Dayjs` 对象
   - `dayjs(stringArg)`, stringArg 符合 ISO 8601 format 时用
-  - `dayjs(stringArg, <customParseFormat>)`, stringArg 不符合 ISO 8601 format 时用，使用前需要引入 `customParseFormat`, 请看《实战 - 问题 1 和 2》
+  - `dayjs(stringArg, <customParseFormat>)`, stringArg 不符合 ISO 8601 format 时用，使用前需要引入 `customParseFormat`, 如果不引入，那就可看成是 `dayjs(stringArg)`。实例请看《实战 - 问题 1 和 2》
 - `Dayjs` 对象 -> `string` 值
   - `toISOString()`, 结果是 UTC time
-  - `format([template])`, 结果是 UTC offset time 或 UTC time, 可以不输入 template, 默认 template 是 `YYYY-MM-DDTHH:mm:ssZ`, 特别注意：这里的`Z`并不是去获取 UTC time，它说的是要保留时区信息，具体看《实战 - 问题 3》
+  - `format([template])`, 结果是 UTC offset time 或 UTC time, 可以不输入 template, 默认 template 是 `YYYY-MM-DDTHH:mm:ssZ`, 特别注意：这里的`Z`并不是去获取 UTC time，它说的是要保留时区信息。实例请看《实战 - 问题 3》
 
 ### 实战
 
