@@ -5,13 +5,14 @@ In JavaScript, variables don't have types, but values do.
 ## Types
 
 > A primitive value is a member of one of the following built-in types: Undeﬁned, Null, Boolean, Number, String, Symbol, and BigInt.
-> Symbol 和 BigInt 用得很少，就没列出来
+> BigInt 用得很少，就没列出来
 
 - Undefined: `undefined`
 - Null: `null`
 - Boolean: `true`, `false`
 - Number
 - String
+- Symbol
 - Object
   - Object: `{}`
   - Array: `[]`
