@@ -1,6 +1,6 @@
 # EcmaScript (ES) blog
 
-我学习 ES 的笔记，基于[ECMAScript 2021](https://262.ecma-international.org/12.0/)，去掉`Symbol`和`BigInt`，因为它们用得很少。
+我学习 ES 的笔记，基于[ECMAScript 2021](https://262.ecma-international.org/12.0/)
 
 ## ES 学习路线
 
