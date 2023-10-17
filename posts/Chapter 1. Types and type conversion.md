@@ -5,25 +5,30 @@ In JavaScript, variables don't have types, but values do.
 ## Types
 
 > A primitive value is a member of one of the following built-in types: Undeﬁned, Null, Boolean, Number, String, Symbol, and BigInt.
-> BigInt 用得很少，就没列出来
+> Symbol 用得比较少, BigInt 用得很少，就没列出来
+
+> primitive 和 object 本质区别是: primitive is not allowed to have properties. 对 primitive value 设置 property 会报 TypeError; 对 primitive value 获取 property 不会报错，原因是：会生成一个临时的 auto-boxing object wrapper
+
+> 记忆思维模型：类比人的生命阶段
+> 未出生： Undefined, Null
+> 会摇头，点头：Boolean（false, true）
+> 会数数：Number（0, 1, 2, ...）
+> 会写字：String（"", "abc", ...）
+> 会更多：Object
 
 - Undefined: `undefined`
 - Null: `null`
-- Boolean: `true`, `false`
+- Boolean: `false`, `true`
 - Number
 - String
-- Symbol
+- Symbol: well-known symbols, e.g. "Symbol.toPrimitive", "Symbol.iterator"
 - Object
   - Object: `{}`
   - Array: `[]`
   - Function: `function foo() {}`
-  - Set: `new Set()`
-  - Map: `new Map()`
-  - Error: `new Error('msg')`
   - Date: `new Date()`
-  - JSON: `JSON.stringify`
-  - Math: `JSON.floor`
-  - RegExp: `/^foo$/gmi`, g: global, m: multiline, i: case-insensitive
+  - Map: `new Map()`
+  - Set: `new Set()`
   - 等等
 
 ## `typeof` operator
@@ -108,15 +113,15 @@ ToBoolean(argument) (抽象运算，运算结果是`true`或者`false`)
 
 ToNumber(argument) (抽象运算，运算结果是 Number 类型值或者 Exception)
 
-| Type of argument | Result                                                                                                                                                                                                                                                                  | Note                        |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| Undefined        | Return `NaN`.                                                                                                                                                                                                                                                           |                             |
-| Null             | Return `0`.                                                                                                                                                                                                                                                             | Oops! 如果是`NaN`会更合适。 |
-| Boolean          | If argument is `true`, return `1`. If argument is `false`, return `0`.                                                                                                                                                                                                  |                             |
-| Number           | Return argument. (十进制数字)                                                                                                                                                                                                                                           |                             |
-| String           | 去掉首尾的空白(包括空格，tab，换行等)后，如果是空字符串，return `0`, 如果看起来是数字(可能是二进制 Binary，八进制 Octal，十六进制 heXadecimal)，return 十进制 decimal 数字 (输入是科学记数法的字符串，输出可能是十进制数字，也可能是科学计数法数字)，否则 return `NaN`. | `"-0"`->`-0`.               |
-| Symbol           | Throw a **TypeError** exception.                                                                                                                                                                                                                                        |                             |
-| Object           | Apply the following steps:<br>1. Let primValue be ? ToPrimitive(argument, number). (**指定了 preferredType**)<br>2. Return ? ToNumber(primValue).                                                                                                                       |                             |
+| Type of argument | Result                                                                                                                                                                                                                                                                    | Note                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| Undefined        | Return `NaN`.                                                                                                                                                                                                                                                             |                             |
+| Null             | Return `0`.                                                                                                                                                                                                                                                               | Oops! 如果是`NaN`会更合适。 |
+| Boolean          | If argument is `false`, return `0`. If argument is `true`, return `1`.                                                                                                                                                                                                    |                             |
+| Number           | Return argument. (十进制数字)                                                                                                                                                                                                                                             |                             |
+| String           | 去掉首尾的空白(包括空格，tab，换行等)后，如果是空字符串，return `0`, 如果看起来是数字(可能是二进制 Binary, 八进制 Octal, 十六进制 heXadecimal, 十进制 decimal, 科学计数法)，return 十进制 decimal 数字 (输出可能是十进制数字，也可能是科学计数法数字)，否则 return `NaN`. | `"-0"`->`-0`.               |
+| Symbol           | Throw a **TypeError** exception.                                                                                                                                                                                                                                          |                             |
+| Object           | Apply the following steps:<br>1. Let primValue be ? ToPrimitive(argument, number). (**指定了 preferredType**)<br>2. Return ? ToNumber(primValue).                                                                                                                         |                             |
 
 ToPrimitive(input[, preferredType]) (抽象运算)
 
@@ -276,7 +281,7 @@ ToString(argument) (抽象运算，运算结果是 String 类型值或者 Except
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | Undefined        | Return `"undefined"`.                                                                                                                             |                   |
 | Null             | Return `"null"`.                                                                                                                                  |                   |
-| Boolean          | If argument is `true`, return `"true"`. If argument is `false`, return `"false"`.                                                                 |                   |
+| Boolean          | If argument is `false`, return `"false"`. If argument is `true`, return `"true"`.                                                                 |                   |
 | Number           | Return NumberToString(argument). (结果是十进制数字字符串，数字非常大时会是科学记数法的字符串)                                                     | Oops! `-0`->`"0"` |
 | String           | Return argument.                                                                                                                                  |                   |
 | Symbol           | Throw a **TypeError** exception.                                                                                                                  |                   |
@@ -352,11 +357,11 @@ foo + ""; // "123"
    1. Let falseRef be the result of evaluating the second AssignmentExpression.
    1. Return ? GetValue(falseRef).
 
-### Binary arithmetic operators (主要与 ToNumber 有关)
+### mathematical operators (主要与 ToNumber 有关)
 
-> spec 中并没有 arithmetic operators 这个术语，个人猜测原因是：`+`还能串接字符串
+> spec 中并没有 mathematical operators 这个术语，个人猜测原因是：`+`还能串接字符串
 
-`+` (addition), `-` (subtraction), `*` (multiplication), `/` (division), `%` (remainder)
+`+` (add), `-` (subtract), `*` (multiply), `/` (divide), `%` (remainder)
 
 会调用：ApplyStringOrNumericBinaryOperator(lval, opText, rval) (抽象运算，简化)
 
@@ -373,9 +378,10 @@ foo + ""; // "123"
 1. Let rnum be ? ToNumber(rval).
 1. Return the result of applying the above operation to lnum and rnum.
 
-### Unary arithmetic operators (与 ToNumber 有关)
+### increment operator, decrement operator (与 ToNumber 有关)
 
-`++` (increment operator, 分为 postfix increment operator 和 prefix increment operator), `--` (decrement operator，分为 postfix 和 prefix)
+`++` (increment operator, 分为 postfix increment operator 和 prefix increment operator)
+`--` (decrement operator，分为 postfix 和 prefix)
 
 以 postfix increment operator 为例：
 
@@ -412,12 +418,13 @@ i++; // i is NaN
 
 ### Equality operators
 
-`==` (double equals), `!=`, `===` (triple equals), `!==`
+`==`, `!=`, `===`, `!==`
 
-> `==`和`===`如何选择？
-> `==`可以考虑用在：`typeof == "string"` (`typeof`运算结果一定是 String 类型), `foo == null` (用来检查 foo 是`null`或者`undefined`)。其他情况推荐使用`===`
+> `==` 和 `===` 如何选择？
+> 实际编码中可以全部用 `===`, 但需要清楚 `==` 原理
+> `==` 可以考虑用在：`typeof == "string"` (`typeof`运算结果一定是 String 类型), `foo == null` (用来检查 foo 是 `null` 或者 `undefined`)
 
-`==`和`!=`会用到 Abstract Equality Comparison (抽象运算，简化)
+`==` 和 `!=` 会用到 IsLooselyEqual (抽象运算，简化)
 
 1. If Type(x) is the same as Type(y), then
    1. Return x === y.
@@ -431,17 +438,51 @@ i++; // i is NaN
 1. If Type(x) is Object and Type(y) is either Number, String, or Symbol, return ? ToPrimitive(x) == y.
 1. Return false.
 
-`===`和`!==`会用到 Strict Equality Comparison (抽象运算，简化)
+`===` 和 `!==` 会用到 IsStrictlyEqual (抽象运算，简化)
 
 1. If Type(x) is different from Type(y), return false.
 1. If Type(x) is Number, then
-   1. If x is NaN, return false.
-   1. If y is NaN, return false.
-   1. If x is +0 and y is -0, return true.
-   1. If x is -0 and y is +0, return true.
-   1. If x is the same as y, return true. (注意进制不同，比如`0xa`和`10`是一样的)
-   1. Return false.
+   1. Return Number::equal(x, y)
 1. Return SameValueNonNumber(lval, rval).
+
+SameValue(x, y) (抽象运算，`Object.is(x, y)`会用到它)
+
+1. If Type(x) is different from Type(y), return false.
+1. If Type(x) is Number, then
+   1. Return Number::sameValue(x, y).
+1. Return SameValueNonNumber(x, y).
+
+SameValueZero(x, y) (抽象运算，`Array.prototype.includes`, `Map`, `Set`会用到它)
+
+1. If Type(x) is different from Type(y), return false.
+1. If Type(x) is Number, then
+   1. Return Number::sameValueZero(x, y).
+1. Return SameValueNonNumber(x, y).
+
+Number::equal(x, y) (抽象运算)
+
+1. If x is NaN, return false.
+1. If y is NaN, return false.
+1. If x is +0 and y is -0, return true.
+1. If x is -0 and y is +0, return true.
+1. If x is the same as y, return true. (注意进制不同，比如`0xa`和`10`是一样的)
+1. Return false.
+
+Number::sameValue(x, y) (抽象运算)
+
+1. If x is NaN and y is NaN, return true.
+1. If x is +0 and y is -0, return false.
+1. If x is -0 and y is +0, return false.
+1. If x is the same as y, return true.
+1. Return false.
+
+Number::sameValueZero(x, y) (抽象运算)
+
+1. If x is NaN and y is NaN, return true.
+1. If x is +0 and y is -0, return true.
+1. If x is -0 and y is +0, return true.
+1. If x is the same as y, return true.
+1. Return false.
 
 SameValueNonNumber(x, y) (抽象运算)
 
@@ -450,7 +491,7 @@ SameValueNonNumber(x, y) (抽象运算)
 1. If Type(x) is Undefined, return true.
 1. If Type(x) is Null, return true.
 1. If Type(x) is Boolean, then
-   1. If x and y are both true or both false, return true; otherwise, return false.
+   1. If x and y are both false or both true, return true; otherwise, return false.
 1. If Type(x) is String, then
    1. If x and y are exactly the same sequence of code units (same length and same code units at corresponding indices), return true; otherwise, return false.
 1. If Type(x) is Symbol, then
@@ -490,25 +531,3 @@ a == c; // false，进行 ===
 // 粗看上述2段代码，会觉得它们违背了上述数学常识，但只要熟悉 == 运算符的算法，
 // 就不会对上述结果感到惊讶。
 ```
-
-SameValue(x, y) (抽象运算，`Object.is(x, y)`会用到它)
-
-1. If Type(x) is different from Type(y), return false.
-1. If Type(x) is Number, then
-   1. If x is NaN and y is NaN, return true.
-   1. If x is +0 and y is -0, return false.
-   1. If x is -0 and y is +0, return false.
-   1. If x is the same as y, return true.
-   1. Return false.
-1. Return SameValueNonNumber(x, y).
-
-SameValueZero(x, y) (抽象运算，`String.prototype.includes`, `Array.prototype.includes`, `Map`, `Set`会用到它)
-
-1. If Type(x) is different from Type(y), return false.
-1. If Type(x) is Number, then
-   1. If x is NaN and y is NaN, return true.
-   1. If x is +0 and y is -0, return true.
-   1. If x is -0 and y is +0, return true.
-   1. If x is the same as y, return true.
-   1. Return false.
-1. Return SameValueNonNumber(x, y).
