@@ -30,39 +30,40 @@
 > `Date` 对象内部存储的是 Unix timestamp (精确到 3 位毫秒, 起始点是 `1970-01-01T00:00:00.000Z`)
 > e.g. `new Date('1970-01-01T08:00:00.123+08:00')` 这个对象的 `valueOf()` 结果是 123
 
-1. Date parses and displays in local time.
-   - ambiguous input (without TDZ) is assumed to be local time
-     - 直接在 input 后追加 local time zone 对应的 TDZ, e.g. `2023-07-01T02:03:04.567` 会被看成 `2023-07-01T02:03:04.567+08:00`
-     - 注意: EcmaScript 的一个特殊情况，如果 input 是 date-only forms, input 后追加的是 `Z`, e.g. `2023-07-01` -> `2023-07-01T00:00:00.000Z`, 参考: <https://262.ecma-international.org/14.0/#sec-date.parse>. date-only forms: `YYYY`, `YYYY-MM`, `YYYY-MM-DD`, date-time forms: date-only forms + (`THH:mm`, `THH:mm:ss`, `THH:mm:ss.SSS`) + an optional TDZ, 参考：<https://262.ecma-international.org/14.0/#sec-date-time-string-format>, 不满足 date-only forms 或者 date-time forms 会导致 Invalid Date
-   - unambiguous input (with TDZ) is adjusted to local time
+1. 只有 local mode, parse and display in local time.
+   - ambiguous input (without TZD) is assumed to be local time
+     - 直接在 input 后追加相应的 TZD, e.g. `2023-07-01T02:03:04.567` 会被看成 `2023-07-01T02:03:04.567+08:00`
+     - 注意: EcmaScript 的一个特殊情况，如果 input 是 date-only forms, input 后追加的是 `Z`, e.g. `2023-07-01` -> `2023-07-01T00:00:00.000Z`, 参考: <https://262.ecma-international.org/14.0/#sec-date.parse>.
+     - date-only forms: `YYYY`, `YYYY-MM`, `YYYY-MM-DD`, date-time forms: date-only forms + (`THH:mm`, `THH:mm:ss`, `THH:mm:ss.SSS`) + an optional TZD, 参考：<https://262.ecma-international.org/14.0/#sec-date-time-string-format>, 不满足 date-only forms 或者 date-time forms 会导致 Invalid Date
+   - unambiguous input (with TZD) is adjusted to local time
 
-- `string` 值 -> `Date` 对象
+- `string` 值 -> `Date` 对象 (这是上面讲的 parse)
   - `new Date(stringArg)`
 - `Date` 对象 -> `string` 值
-  - `toString()`, 总是会转换为 local (以 GMT 格式表达，e.g. `Sat Jul 01 2023 02:03:04 GMT+0800 (China Standard Time)`)，参考：<https://262.ecma-international.org/14.0/#sec-date.prototype.tostring>
+  - `toString()`, 以 GMT 格式表达，e.g. `Sat Jul 01 2023 02:03:04 GMT+0800 (China Standard Time)`，参考：<https://262.ecma-international.org/14.0/#sec-date.prototype.tostring>
   - `toISOString()`, ISO 指的是 ISO 8601, 结果是 UTC time, 一般是用这个方法
 
 ### 第三方库 dayjs
 
 > Dayjs object is a wrapper for the `Date` object
 
-1. in local mode, parses and displays in local time
-   - ambiguous input (without offset) is assumed to be local time
-     - 直接在 input 后追加 local time zone 对应的 TDZ, e.g. `2023-07-01T02:03:04.567` 会被看成 `2023-07-01T02:03:04.567+08:00`
-   - unambiguous input (with offset) is adjusted to local time
-1. in UTC mode, parses and displays in UTC time
+1. in local mode, parse and display in local time
+   - ambiguous input (without TZD) is assumed to be local time
+     - 直接在 input 后追加相应的 TZD, e.g. `2023-07-01T02:03:04.567` 会被看成 `2023-07-01T02:03:04.567+08:00`
+   - unambiguous input (with TZD) is adjusted to local time
+1. in UTC mode, parse and display in UTC time
    - ambiguous input is assumed to be UTC time
      - 直接在 input 后追加 `Z`
    - unambiguous input is adjusted to UTC time.
 1. local 当前时间: `dayjs()`, convert local to UTC time: `.utc()`
 1. UTC 当前时间: `dayjs.utc()`, convert UTC to local time: `.local()`
 
-- `string` 值 -> `Dayjs` 对象
+- `string` 值 -> `Dayjs` 对象 (这是上面讲的 parse)
   - `dayjs(stringArg)`, stringArg 符合 ISO 8601 format 时用
-  - `dayjs(stringArg, <customParseFormat>)`, 使用前需要引入 `customParseFormat`, 如果不引入，那就可看成是 `dayjs(stringArg)`。实例请看《实战 - 问题 1 和 2》
+  - `dayjs(stringArg, <customParseFormat>)`, 使用前需要引入 `customParseFormat`, 如果不引入，那就可看成是 `dayjs(stringArg)`。实例请看《实战 - 问题 1》
 - `Dayjs` 对象 -> `string` 值
-  - `format([template])`, template 可选，默认是 `YYYY-MM-DDTHH:mm:ssZ`, 特别注意：这里的`Z`并不是去获取 UTC time，它说的是要保留时区信息。实例请看《实战 - 问题 3》
-  - `toISOString()`, 调用的是对应原生 `Date` 对象的 `toISOString`方法
+  - `format([template])`, template 可选，默认是 `YYYY-MM-DDTHH:mm:ssZ`, 特别注意：这里的 `Z` 不是去获取 UTC time，说的是要保留时区信息。实例请看《实战 - 问题 2》
+  - `toISOString()`, 调用的是原生 `Date` 对象的 `toISOString`方法
 
 ### 第三方库 moment
 
@@ -73,16 +74,13 @@
 
 ### 实战
 
-问题 1: 后端返回一个 time (e.g. `2023-07-01T02:03:04Z`), 要求前端把它看成是 local time, 如何处理?
+问题 1: 后端返回一个 time (e.g. `2023-07-01T02:03:04Z`), 要求前端把它看成是 local time, 即：`2023-07-01T02:03:04+08:00`, 如何处理?
 思路 1: 要点是如何丢掉时区？因为后端返回的字符串可能是`Z`结尾，也可能是`+02:00`之类的结尾
-答案 1: `dayjs(backendString, 'YYYY-MM-DDTHH:mm:ss')`, 特别注意：需要引入 `customParseFormat`, 不然 dayjs 会进行时区换算, 那样的话结果就不对了
+答案 1: `dayjs(backendString, 'YYYY-MM-DDTHH:mm:ss')`, 特别注意：需要引入 `customParseFormat`, 不然就理解是 `dayjs(backendString)`, 这就会进行时区换算, 结果是 `2023-07-01T10:03:04+08:00`, 这不是想要的结果
 
-问题 2: 后端返回`08:00`, 前端需要在 antd 时间组件中显示出来，如何做？
-答案 2: dayjs: `dayjs('08:00', 'HH:mm')`, 特别注意：需要引入 `customParseFormat`, 不然无法得到一个有效的 Dayjs 对象
-
-问题 3: `dayjs('2023-07-01T02:03:04+01:00').format('YYYY-MM-DD HH:mm')` 和 `dayjs('2023-07-01T02:03:04+01:00').format('YYYY-MM-DD HH:mmZ')` 有什么区别？
-思路 3: 要点是`dayjs('2023-07-01T02:03:04+01:00')`到底是什么？format 中的结尾处一个没有 Z，一个有 Z，有什么区别？
-答案 3: 具体过程如下：
+问题 2: `dayjs('2023-07-01T02:03:04+01:00').format('YYYY-MM-DD HH:mm')` 和 `dayjs('2023-07-01T02:03:04+01:00').format('YYYY-MM-DD HH:mmZ')` 有什么区别？
+思路 2: 要点是`dayjs('2023-07-01T02:03:04+01:00')`到底是什么？format 中的结尾处一个没有 Z，一个有 Z，有什么区别？
+答案 2: 具体过程如下：
 
 1. `dayjs('2023-07-01T02:03:04+01:00')`生成对象时用的是 local mode, input 会被 adjust to local time, i.e. `2023-07-01T09:03:04+08:00`
 1. 调用对象的 format 方法
